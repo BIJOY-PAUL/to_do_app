@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/constants/colors.dart';
+import 'package:to_do_app/model/todo.dart';
+import 'package:to_do_app/widgets/todo_item.dart';
 
-class homePage extends StatelessWidget {
-  const homePage({super.key});
+class homePage extends StatefulWidget {
+  homePage({super.key});
+
+  @override
+  State<homePage> createState() => _homePageState();
+}
+
+class _homePageState extends State<homePage> {
+  final todosList = ToDo.todoList();
 
   @override
   Widget build(BuildContext context) {
@@ -10,27 +19,107 @@ class homePage extends StatelessWidget {
       backgroundColor: tdBGColor,
       appBar: _buildAppBar(),
 
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      body: Stack(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
 
-        child: Column(
-          children: [
-            SearchBox(),
-            ListView(
+            child: Column(
               children: [
-                Container(
-                  margin: EdgeInsets.only(top: 50, bottom: 20),
-                  child: Text(
-                    "All ToDos",
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                SearchBox(),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 50, bottom: 20),
+                        child: Text(
+                          "All ToDos",
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+
+                      for (ToDo todo in todosList)
+                        ToDoItem(
+                          todo: todo,
+                          onToDoChanged: _handleToDoChange,
+                          onDeleteItem: _deleteToDoItem,
+                        ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+
+          Align(
+            alignment: Alignment.bottomCenter,
+
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: 20, right: 20, left: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(0.0, 0.0),
+                          blurRadius: 10.0,
+                          spreadRadius: 0.0,
+                        ),
+                      ],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: "Add a new todo item",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+
+                Container(
+                  margin: EdgeInsets.only(bottom: 20, right: 20),
+
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: tdBlue,
+                      minimumSize: Size(60, 60),
+                      elevation: 10,
+                    ),
+                    onPressed: () {},
+
+                    child: Text(
+                      "+",
+                      style: TextStyle(fontSize: 40, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  void _handleToDoChange(ToDo todo) {
+    setState(() {
+      todo.isDone = !todo.isDone;
+    });
+  }
+
+  void _deleteToDoItem(String id) {
+    setState(() {
+      todosList.removeWhere((item) => item.id == id);
+    });
   }
 
   Widget SearchBox() {
