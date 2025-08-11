@@ -12,6 +12,7 @@ class homePage extends StatefulWidget {
 
 class _homePageState extends State<homePage> {
   final todosList = ToDo.todoList();
+  final _todoController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +78,7 @@ class _homePageState extends State<homePage> {
                     ),
 
                     child: TextField(
+                      controller: _todoController,
                       decoration: InputDecoration(
                         hintText: "Add a new todo item",
                         border: InputBorder.none,
@@ -94,7 +96,9 @@ class _homePageState extends State<homePage> {
                       minimumSize: Size(60, 60),
                       elevation: 10,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      _addTodoItem(_todoController.text);
+                    },
 
                     child: Text(
                       "+",
@@ -120,6 +124,19 @@ class _homePageState extends State<homePage> {
     setState(() {
       todosList.removeWhere((item) => item.id == id);
     });
+  }
+
+  void _addTodoItem(String toDo) {
+    setState(() {
+      todosList.add(
+        ToDo(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          todoText: toDo,
+        ),
+      );
+    });
+
+    _todoController.clear();
   }
 
   Widget SearchBox() {
